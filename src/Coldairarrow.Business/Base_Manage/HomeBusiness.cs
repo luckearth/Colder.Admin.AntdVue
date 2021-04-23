@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using Coldairarrow.Business.Cache;
 using Coldairarrow.Entity.Base_Manage;
 using Coldairarrow.IBusiness;
 using Coldairarrow.Util;
 using EFCore.Sharding;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,11 +14,13 @@ namespace Coldairarrow.Business.Base_Manage
     {
         readonly IOperator _operator;
         readonly IMapper _mapper;
-        public HomeBusiness(IDbAccessor db, IOperator @operator, IMapper mapper)
+        private readonly IBase_UserCache _base_UserCache;
+        public HomeBusiness(IDbAccessor db, IOperator @operator, IMapper mapper, IBase_UserCache base_UserCache)
             : base(db)
         {
             _operator = @operator;
             _mapper = mapper;
+            _base_UserCache = base_UserCache;
         }
 
         public async Task<string> SubmitLoginAsync(LoginInputDTO input)
@@ -31,15 +33,7 @@ namespace Coldairarrow.Business.Base_Manage
             if (theUser.IsNullOrEmpty())
                 throw new BusException("账号或密码不正确！");
 
-            //生成token,有效期一天
-            JWTPayload jWTPayload = new JWTPayload
-            {
-                UserId = theUser.Id,
-                Expire = DateTime.Now.AddDays(1)
-            };
-            string token = JWTHelper.GetToken(jWTPayload.ToJson(), JWTHelper.JWTSecret);
-
-            return token;
+            return theUser.Id;
         }
 
         public async Task ChangePwdAsync(ChangePwdInputDTO input)
@@ -50,6 +44,9 @@ namespace Coldairarrow.Business.Base_Manage
 
             theUser.Password = input.newPwd.ToMD5String();
             await UpdateAsync(_mapper.Map<Base_User>(theUser));
+
+            //更新缓存
+            await _base_UserCache.UpdateCacheAsync(theUser.Id);
         }
     }
 }

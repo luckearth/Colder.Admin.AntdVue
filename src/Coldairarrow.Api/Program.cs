@@ -1,5 +1,9 @@
 ﻿using Coldairarrow.Util;
+using Colder.Logging.Serilog;
+using EFCore.Sharding;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Coldairarrow.Api
@@ -9,14 +13,28 @@ namespace Coldairarrow.Api
         public static void Main(string[] args)
         {
             Host.CreateDefaultBuilder(args)
+                .ConfigureLoggingDefaults()
                 .UseIdHelper()
-                .UseLog()
                 .UseCache()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddFxServices();
+                    services.AddAutoMapper();
+                    services.AddEFCoreSharding(config =>
+                    {
+                        services.Configure<EFCoreShardingOptions>(shardingOption =>
+                        {
+                            shardingOption.EntityAssemblies = GlobalAssemblies.AllAssemblies;
+                        });
+
+                        var dbOptions = hostContext.Configuration.GetSection("Database:BaseDb").Get<DatabaseOptions>();
+
+                        config.UseDatabase(dbOptions.ConnectionString, dbOptions.DatabaseType);
+                    });
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder
-                        .UseUrls("http://*:5000")
-                        .UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>();
                 })
                 .Build()
                 .Run();

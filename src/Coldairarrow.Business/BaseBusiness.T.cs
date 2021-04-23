@@ -227,9 +227,9 @@ namespace Coldairarrow.Business
         /// <returns>
         /// 影响条数
         /// </returns>
-        public int Delete_Sql(Expression<Func<T, bool>> where)
+        public int DeleteSql(Expression<Func<T, bool>> where)
         {
-            return Db.Delete_Sql(where);
+            return Db.DeleteSql(where);
         }
 
         /// <summary>
@@ -241,9 +241,9 @@ namespace Coldairarrow.Business
         /// <returns>
         /// 影响条数
         /// </returns>
-        public async Task<int> Delete_SqlAsync(Expression<Func<T, bool>> where)
+        public async Task<int> DeleteSqlAsync(Expression<Func<T, bool>> where)
         {
-            return await Db.Delete_SqlAsync(where);
+            return await Db.DeleteSqlAsync(where);
         }
 
         #endregion
@@ -291,9 +291,9 @@ namespace Coldairarrow.Business
         /// </summary>
         /// <param name="whereExpre">筛选表达式</param>
         /// <param name="set">更改属性回调</param>
-        public int UpdateWhere(Expression<Func<T, bool>> whereExpre, Action<T> set)
+        public int Update(Expression<Func<T, bool>> whereExpre, Action<T> set)
         {
-            return Db.UpdateWhere(whereExpre, set);
+            return Db.Update(whereExpre, set);
         }
 
         /// <summary>
@@ -301,9 +301,9 @@ namespace Coldairarrow.Business
         /// </summary>
         /// <param name="whereExpre">筛选表达式</param>
         /// <param name="set">更改属性回调</param>
-        public async Task<int> UpdateWhereAsync(Expression<Func<T, bool>> whereExpre, Action<T> set)
+        public async Task<int> UpdateAsync(Expression<Func<T, bool>> whereExpre, Action<T> set)
         {
-            return await Db.UpdateWhereAsync(whereExpre, set);
+            return await Db.UpdateAsync(whereExpre, set);
         }
 
         /// <summary>
@@ -314,9 +314,9 @@ namespace Coldairarrow.Business
         /// <param name="where">筛选条件</param>
         /// <param name="values">字段值设置</param>
         /// <returns>影响条数</returns>
-        public int UpdateWhere_Sql(Expression<Func<T, bool>> where, params (string field, UpdateType updateType, object value)[] values)
+        public int UpdateSql(Expression<Func<T, bool>> where, params (string field, UpdateType updateType, object value)[] values)
         {
-            return Db.UpdateWhere_Sql(where, values);
+            return Db.UpdateSql(where, values);
         }
 
         /// <summary>
@@ -327,9 +327,9 @@ namespace Coldairarrow.Business
         /// <param name="where">筛选条件</param>
         /// <param name="values">字段值设置</param>
         /// <returns>影响条数</returns>
-        public async Task<int> UpdateWhere_SqlAsync(Expression<Func<T, bool>> where, params (string field, UpdateType updateType, object value)[] values)
+        public async Task<int> UpdateSqlAsync(Expression<Func<T, bool>> where, params (string field, UpdateType updateType, object value)[] values)
         {
-            return await Db.UpdateWhere_SqlAsync(where, values);
+            return await Db.UpdateSqlAsync(where, values);
         }
 
         #endregion
@@ -362,7 +362,7 @@ namespace Coldairarrow.Business
         /// <returns></returns>
         public List<T> GetList()
         {
-            return Db.GetList<T>();
+            return Db.GetIQueryable<T>().ToList();
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace Coldairarrow.Business
         /// <returns></returns>
         public async Task<List<T>> GetListAsync()
         {
-            return await Db.GetListAsync<T>();
+            return await Db.GetIQueryable<T>().ToListAsync();
         }
 
         /// <summary>

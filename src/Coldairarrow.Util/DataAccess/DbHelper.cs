@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
+using System.Text;
 
 namespace Coldairarrow.Util
 {
@@ -288,7 +289,13 @@ namespace {nameSpace}
 {properties}
     }}
 }}";
-            FileHelper.WriteTxt(fileStr, filePath, FileMode.Create);
+            var dir = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            File.WriteAllText(filePath, fileStr, Encoding.UTF8);
         }
 
         #endregion
